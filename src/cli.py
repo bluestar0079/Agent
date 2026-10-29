@@ -76,7 +76,9 @@ def cmd_run(args: argparse.Namespace) -> int:
     toolbox = ToolBox(store, faults)
 
     max_steps = args.max_steps or scenario.get("max_steps") or settings.max_steps
-    max_tool_calls = args.max_tool_calls or settings.max_tool_calls
+    max_tool_calls = (
+        args.max_tool_calls or scenario.get("max_tool_calls") or settings.max_tool_calls
+    )
 
     if args.provider == "mock":
         provider = MockProvider(scenario)

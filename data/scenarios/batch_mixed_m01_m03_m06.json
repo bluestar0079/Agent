@@ -1,0 +1,27 @@
+{
+  "scenario_id": "batch_mixed_m01_m03_m06",
+  "title": "一批素材：M01 时段冲突待确认、M03 医疗类目阻断、M06 正常排期，一次 finish 交全部结果",
+  "date": "2026-11-02",
+  "asset_ids": ["M01", "M03", "M06"],
+  "user_request": "请处理这批素材：M01、M03、M06。M01 用户要求 18:00 发布，其余按规则安排。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [
+      {"account_id": "A07", "slot": "17:30", "asset_id": "X01", "date": "2026-11-02"},
+      {"account_id": "A07", "slot": "18:00", "asset_id": "X02", "date": "2026-11-02"}
+    ],
+    "drafts": []
+  },
+  "faults": {},
+  "max_steps": 26,
+  "max_tool_calls": 22,
+  "expect": {
+    "task_status": "pending_confirmation",
+    "items_count": 3,
+    "per_asset": {
+      "M01": {"review_status": "risk_needs_review", "suggested_slot": "20:00", "draft_saved": true},
+      "M03": {"review_status": "risk_blocked", "suggested_slot": null, "draft_saved": false},
+      "M06": {"review_status": "no_risk", "suggested_slot": "18:00", "draft_saved": true}
+    },
+    "drafts_count": 2
+  }
+}

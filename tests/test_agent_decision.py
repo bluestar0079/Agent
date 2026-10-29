@@ -98,6 +98,28 @@ def test_step_limit_returns_explicit_incomplete_state():
     assert len(trace["steps"]) <= 2
 
 
+def test_batch_processes_every_asset_in_one_run():
+    """一批素材里同时出现冲突、阻断、正常三种情况，每条都要有结论。"""
+    result, trace, store, _ = run_scenario("batch_mixed_m01_m03_m06")
+    by_id = {item.asset_id: item for item in result.items}
+
+    assert len(result.items) == 3
+    assert set(by_id) == {"M01", "M03", "M06"}
+
+    assert by_id["M01"].suggested_slot == "20:00"
+    assert by_id["M01"].draft.saved is True
+    assert by_id["M03"].review_status == "risk_blocked"
+    assert by_id["M03"].suggested_slot is None
+    assert by_id["M03"].draft is None
+    assert by_id["M06"].suggested_slot == "18:00"
+    assert by_id["M06"].draft.saved is True
+
+    # 有一条待确认 → 整体是 pending_confirmation；两条草稿，不含被阻断的那条
+    assert result.task_status == "pending_confirmation"
+    assert len(store.drafts_snapshot()) == 2
+    assert tool_sequence(trace).count("get_asset") == 3
+
+
 def test_two_paths_use_different_tool_sequences():
     """考试硬性要求：两条执行路径必须因工具结果不同而不同。"""
     _, normal_trace, _, _ = run_scenario("normal_m01")

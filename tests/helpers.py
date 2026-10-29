@@ -30,10 +30,11 @@ def run_scenario(name: str, provider_factory=None):
     toolbox = ToolBox(store, faults)
     provider = provider_factory(scenario) if provider_factory else MockProvider(scenario)
     max_steps = scenario.get("max_steps") or 14
+    max_tool_calls = scenario.get("max_tool_calls") or 12
     recorder = TraceRecorder(
-        scenario["scenario_id"], provider.name, provider.model, max_steps, 12
+        scenario["scenario_id"], provider.name, provider.model, max_steps, max_tool_calls
     )
-    result = run_agent(scenario, provider, toolbox, recorder, max_steps, 12)
+    result = run_agent(scenario, provider, toolbox, recorder, max_steps, max_tool_calls)
     return result, recorder.to_dict(), store, toolbox
 
 

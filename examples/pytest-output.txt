@@ -2,41 +2,46 @@
 
 命令：`"D:/Anaconda/python.exe" -m pytest -v`
 
-说明：29 个测试全部离线执行，使用 MockProvider / ScriptedProvider，不依赖网络。
+说明：34 个测试全部离线执行，使用 MockProvider / ScriptedProvider，不依赖网络。
 
 ```
 ============================= test session starts =============================
-collecting ... collected 29 items
+collecting ... collected 34 items
 
-tests/test_agent_decision.py::test_normal_path_saves_draft_at_required_slot PASSED [  3%]
-tests/test_agent_decision.py::test_conflict_path_switches_slot_and_asks_for_confirmation PASSED [  6%]
-tests/test_agent_decision.py::test_missing_metadata_triggers_lookup_then_blocks PASSED [ 10%]
-tests/test_agent_decision.py::test_rule_risk_blocks_without_scheduling PASSED [ 13%]
-tests/test_agent_decision.py::test_hard_requirement_is_not_changed_silently PASSED [ 17%]
-tests/test_agent_decision.py::test_duplicate_submission_does_not_save_again PASSED [ 20%]
-tests/test_agent_decision.py::test_save_failure_is_retried_then_reported_truthfully PASSED [ 24%]
-tests/test_agent_decision.py::test_persistent_save_failure_returns_incomplete PASSED [ 27%]
-tests/test_agent_decision.py::test_step_limit_returns_explicit_incomplete_state PASSED [ 31%]
-tests/test_agent_decision.py::test_two_paths_use_different_tool_sequences PASSED [ 34%]
-tests/test_guardrails.py::test_no_publish_capability_exists PASSED       [ 37%]
-tests/test_guardrails.py::test_result_schema_cannot_express_published PASSED [ 41%]
-tests/test_guardrails.py::test_failure_is_never_reported_as_success PASSED [ 44%]
-tests/test_guardrails.py::test_step_limit_is_enforced_for_looping_model PASSED [ 48%]
-tests/test_guardrails.py::test_tool_call_budget_is_enforced PASSED       [ 51%]
-tests/test_schema.py::test_minimal_completed_is_valid PASSED             [ 55%]
-tests/test_schema.py::test_incomplete_status_requires_reason[incomplete] PASSED [ 58%]
-tests/test_schema.py::test_incomplete_status_requires_reason[step_limit] PASSED [ 62%]
-tests/test_schema.py::test_unknown_status_is_rejected PASSED             [ 65%]
-tests/test_schema.py::test_invalid_review_status_is_rejected PASSED      [ 68%]
-tests/test_schema.py::test_item_keeps_required_slot_separate_from_suggested_slot PASSED [ 72%]
-tests/test_tools.py::test_query_slots_marks_occupied PASSED              [ 75%]
-tests/test_tools.py::test_check_rules_blocks_interval_violation PASSED   [ 79%]
-tests/test_tools.py::test_check_rules_passes_at_two_hour_gap PASSED      [ 82%]
-tests/test_tools.py::test_save_draft_is_idempotent PASSED                [ 86%]
-tests/test_tools.py::test_save_draft_guard_rejects_blocked_slot PASSED   [ 89%]
-tests/test_tools.py::test_missing_args_error_is_actionable PASSED        [ 93%]
-tests/test_tools.py::test_get_asset_detail_fills_missing_category PASSED [ 96%]
+tests/test_agent_decision.py::test_normal_path_saves_draft_at_required_slot PASSED [  2%]
+tests/test_agent_decision.py::test_conflict_path_switches_slot_and_asks_for_confirmation PASSED [  5%]
+tests/test_agent_decision.py::test_missing_metadata_triggers_lookup_then_blocks PASSED [  8%]
+tests/test_agent_decision.py::test_rule_risk_blocks_without_scheduling PASSED [ 11%]
+tests/test_agent_decision.py::test_hard_requirement_is_not_changed_silently PASSED [ 14%]
+tests/test_agent_decision.py::test_duplicate_submission_does_not_save_again PASSED [ 17%]
+tests/test_agent_decision.py::test_save_failure_is_retried_then_reported_truthfully PASSED [ 20%]
+tests/test_agent_decision.py::test_persistent_save_failure_returns_incomplete PASSED [ 23%]
+tests/test_agent_decision.py::test_step_limit_returns_explicit_incomplete_state PASSED [ 26%]
+tests/test_agent_decision.py::test_batch_processes_every_asset_in_one_run PASSED [ 29%]
+tests/test_agent_decision.py::test_two_paths_use_different_tool_sequences PASSED [ 32%]
+tests/test_guardrails.py::test_no_publish_capability_exists PASSED       [ 35%]
+tests/test_guardrails.py::test_result_schema_cannot_express_published PASSED [ 38%]
+tests/test_guardrails.py::test_failure_is_never_reported_as_success PASSED [ 41%]
+tests/test_guardrails.py::test_step_limit_is_enforced_for_looping_model PASSED [ 44%]
+tests/test_guardrails.py::test_tool_call_budget_is_enforced PASSED       [ 47%]
+tests/test_schema.py::test_minimal_completed_is_valid PASSED             [ 50%]
+tests/test_schema.py::test_incomplete_status_requires_reason[incomplete] PASSED [ 52%]
+tests/test_schema.py::test_incomplete_status_requires_reason[step_limit] PASSED [ 55%]
+tests/test_schema.py::test_unknown_status_is_rejected PASSED             [ 58%]
+tests/test_schema.py::test_invalid_review_status_is_rejected PASSED      [ 61%]
+tests/test_schema.py::test_schedulable_item_requires_suggested_slot[no_risk] PASSED [ 64%]
+tests/test_schema.py::test_schedulable_item_requires_suggested_slot[risk_needs_review] PASSED [ 67%]
+tests/test_schema.py::test_blocked_item_may_omit_suggested_slot[risk_blocked] PASSED [ 70%]
+tests/test_schema.py::test_blocked_item_may_omit_suggested_slot[unknown] PASSED [ 73%]
+tests/test_schema.py::test_item_keeps_required_slot_separate_from_suggested_slot PASSED [ 76%]
+tests/test_tools.py::test_query_slots_marks_occupied PASSED              [ 79%]
+tests/test_tools.py::test_check_rules_blocks_interval_violation PASSED   [ 82%]
+tests/test_tools.py::test_check_rules_passes_at_two_hour_gap PASSED      [ 85%]
+tests/test_tools.py::test_save_draft_is_idempotent PASSED                [ 88%]
+tests/test_tools.py::test_save_draft_guard_rejects_blocked_slot PASSED   [ 91%]
+tests/test_tools.py::test_missing_args_error_is_actionable PASSED        [ 94%]
+tests/test_tools.py::test_get_asset_detail_fills_missing_category PASSED [ 97%]
 tests/test_tools.py::test_fault_injection_can_fail_save_once PASSED      [100%]
 
-============================= 29 passed in 0.07s ==============================
+============================= 34 passed in 0.08s ==============================
 ```

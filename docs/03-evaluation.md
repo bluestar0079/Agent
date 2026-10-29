@@ -4,8 +4,8 @@
 
 | 证据 | 用什么跑 | 能证明什么 | 不能证明什么 |
 |---|---|---|---|
-| `tests/` 29 个测试 | `MockProvider` / `ScriptedProvider` | 流程、状态机、护栏、幂等、预算是否按设计工作 | 模型能否做出正确决策 |
-| `examples/run-0*` 9 组记录 | `qwen3.8-flash` 真实模型 | 模型在真实工具返回下能否调整动作 | 结果的可重复性（温度非 0，每次略有差异） |
+| `tests/` 34 个测试 | `MockProvider` / `ScriptedProvider` | 流程、状态机、护栏、幂等、预算是否按设计工作 | 模型能否做出正确决策 |
+| `examples/run-0*` 10 组记录 | `qwen3.8-flash` 真实模型 | 模型在真实工具返回下能否调整动作 | 结果的可重复性（温度非 0，每次略有差异） |
 
 下面分别列出。
 
@@ -13,8 +13,8 @@
 
 ```bash
 $ "D:/Anaconda/python.exe" -m pytest -q
-.............................                                            [100%]
-29 passed in 0.16s
+..................................                                       [100%]
+34 passed in 0.08s
 ```
 
 逐条用例的完整输出见 [examples/pytest-output.txt](../examples/pytest-output.txt)。
@@ -22,9 +22,9 @@ $ "D:/Anaconda/python.exe" -m pytest -q
 | 测试文件 | 覆盖 | 用例数 |
 |---|---|---|
 | `test_tools.py` | 时段占用、R2 判定、草稿幂等、越权守门、参数错误可自愈、补查、故障注入 | 8 |
-| `test_agent_decision.py` | 九类验收点的端到端行为 + 两条路径必须不同 | 10 |
+| `test_agent_decision.py` | 九类验收点的端到端行为 + 两条路径必须不同 + 一批素材一次跑完 | 11 |
 | `test_guardrails.py` | 无发布能力、schema 无法表达 published、失败不虚报、步数与工具调用上限 | 5 |
-| `test_schema.py` | finish 载荷校验（缺 reason、非法状态、required/suggested 分离） | 6 |
+| `test_schema.py` | finish 载荷校验（缺 reason、非法状态、required/suggested 分离、可排期时 suggested_slot 必填） | 10 |
 
 关键断言举例：
 
@@ -39,9 +39,10 @@ assert obs["error"]["code"] == "rule_violation"
 assert tool_sequence(normal) != tool_sequence(conflict)
 ```
 
-## 3.3 九组真实模型运行结果
+## 3.3 十组真实模型运行结果
 
-全部由 `qwen3.8-flash` 产生，`--provider qwen`，预算 14 步 / 12 次工具调用。
+全部由 `qwen3.8-flash` 产生，`--provider qwen`。前九组预算 14 步 / 12 次工具调用，
+批处理那组为 26 步 / 22 次（整批共享）。
 
 | 记录 | 场景 | 状态 | 步数 | 关键结果 |
 |---|---|---|---|---|
@@ -51,9 +52,10 @@ assert tool_sequence(normal) != tool_sequence(conflict)
 | [run-04-rule-risk](../examples/run-04-rule-risk) | 规则风险 | `blocked` | 2 | R1 阻断，未查时段、未存草稿 |
 | [run-05-hard-requirement](../examples/run-05-hard-requirement) | 硬性要求 | `pending_confirmation` | 7 | 要求 19:00 仍保留，建议 20:00，待确认非空 |
 | [run-06-duplicate](../examples/run-06-duplicate) | 重复提交 | `completed` | 5 | 未调 `save_draft`，草稿数仍为 1 |
-| [run-07-save-fail](../examples/run-07-save-fail) | 保存失败（可重试） | `completed` | 8 | 失败 → 重试 → 参数不全 → 自我修正 → 成功 |
+| [run-07-save-fail](../examples/run-07-save-fail) | 保存失败（可重试） | `completed` | 7 | 首次 `storage_unavailable` → 判断 retryable → 重试成功，草稿 `D-F54BD617` |
 | [run-08-save-fail-persistent](../examples/run-08-save-fail-persistent) | 保存失败（不可重试） | `incomplete` | 6 | 明确失败，`draft.saved=false` |
 | [run-09-step-limit](../examples/run-09-step-limit) | 步数上限 | `step_limit` | 2 | 触顶即停，返回未完成原因 |
+| [run-10-batch](../examples/run-10-batch) | 一批三素材（冲突 + 阻断 + 正常） | `pending_confirmation` | 15 | 一次 finish 交 3 条结论，2 份草稿，被阻断的那条不存草稿 |
 
 ### 两条执行路径的对比（题目硬性要求）
 
@@ -98,19 +100,25 @@ R2 要求同账号两次发布间隔 ≥120 分钟，而账号 A07 在 18:00 已
 
 ## 3.4 失败与限制（如实记录）
 
-### ① 模型在 `run-07` 漏填 `suggested_slot`
+### ① `suggested_slot` 漏填 —— 已修复
 
-`run-07` 的草稿实际保存在 18:00，但 finish 载荷里 `suggested_slot` 是 `null`。
+早先一次 `run-07` 里，草稿实际保存在 18:00，但 finish 载荷的 `suggested_slot` 是 `null`。
 任务结论（草稿已存、未发布）没受影响，但报告字段不完整。
-**这是模型的输出稳定性问题，不是流程问题。** 可选的改法是把它设为 schema 必填并回灌校验错误让它重填，
-本次未做，列入下一步。
+
+修复方式是加一条条件必填：`review_status` 为 `no_risk` / `risk_needs_review` 时必须给出建议时段；
+被阻断或信息不足的素材本来就没时段，不强制。校验失败时 `agent.py` 会把 pydantic 的错误体回灌给模型，
+让它补填而不是直接失败。重跑后 `run-07` 正确填写了 `18:00`，
+`test_schedulable_item_requires_suggested_slot` 把这个约束固化下来。
 
 ### ② 第一次跑 `run-07` 时任务失败
 
-第一次运行（已覆盖）时，模型重试 `save_draft` 漏传了 `slot`，工具只返回
+最早那次运行里，模型重试 `save_draft` 漏传了 `slot`，工具只返回
 `TypeError: missing 1 required positional argument: 'slot'`，模型无法据此修正，最终 `incomplete`。
-据此改了两处：`dispatch()` 在调用前显式校验必填参数，错误信息里带上必需参数列表和 `retryable=true`。
-重跑后模型在下一步补全参数并成功。这个修改有代码和证据（`run-07` 第 7→8 步）。
+据此改了 `dispatch()`：调用前显式校验必填参数，错误信息里带上缺失字段、必需参数列表和 `retryable=true`。
+
+需要说明的是，**修完之后的那次重跑里模型第一次重试就带全了参数**（`run-07` 第 6→7 步），
+没有再触发参数错误，因此这条修复的当前证据是测试 `test_missing_args_error_is_actionable`，
+而不是某次运行记录。原始失败记录在修 schema 后已不合规（`suggested_slot` 为空），未保留。
 
 ### ③ `run-09` 不是模型能力测试
 
@@ -125,7 +133,8 @@ R2 要求同账号两次发布间隔 ≥120 分钟，而账号 A07 在 18:00 已
 ### ⑤ 其他限制
 
 - 温度非 0，真实模型每次输出可能有差异，不能保证逐字复现；结论层面的断言（选了什么时段、存没存草稿）是稳定的。
-- 单素材处理，没有批量。
+- **批量是串行的**：一批素材按顺序处理，不并发；批次越大，单条的处理步数越容易被预算压缩。
+- **草稿之间不互相占位**：`save_draft` 只写草稿，不会把时段加进 `bookings`，所以同账号的两条素材在同一批里理论上可能都拿到同一个建议时段。真实系统里应当在草稿阶段就占位，本次未做。
 - 规则集只有 5 条，不含节假日/时区。
 - 依赖百炼接口的可用性；离线时只能跑 mock。
 
@@ -140,6 +149,7 @@ PY="D:/Anaconda/python.exe"
 # 真实模型（需要 .env 里的 DASHSCOPE_API_KEY）
 "$PY" -m src.cli run --scenario data/scenarios/conflict_m01.json --provider qwen --out runs/repro-conflict
 "$PY" -m src.cli run --scenario data/scenarios/save_fail_m01.json --provider qwen --out runs/repro-save-fail
+"$PY" -m src.cli run --scenario data/scenarios/batch_mixed_m01_m03_m06.json --provider qwen --out runs/repro-batch
 
 # 离线流程
 "$PY" -m src.cli run --scenario data/scenarios/duplicate_m06.json --provider mock --out runs/repro-duplicate

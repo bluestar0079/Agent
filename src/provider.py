@@ -129,8 +129,16 @@ class MockProvider:
 
     def __init__(self, task: dict) -> None:
         self.task = task
-        self.mem: dict[str, Any] = {
-            "asset_id": (task.get("asset_ids") or [None])[0],
+        self.queue = list(task.get("asset_ids") or [])
+        # 每条素材处理完的结论，最后一次性交给 finish
+        self.collected: list[dict[str, Any]] = []
+        first = self.queue.pop(0) if self.queue else None
+        self.mem: dict[str, Any] = self._fresh_mem(first)
+
+    @staticmethod
+    def _fresh_mem(asset_id: str | None) -> dict[str, Any]:
+        return {
+            "asset_id": asset_id,
             "account_id": None,
             "asset": None,
             "risks": [],
@@ -138,6 +146,7 @@ class MockProvider:
             "slot": None,
             "save_attempts": 0,
             "draft": None,
+            "missing": False,
         }
 
     # ---- 内部工具 ----
@@ -170,8 +179,54 @@ class MockProvider:
         )
 
     def _finish(self, text: str, status: str, **extra) -> ModelAction:
-        payload = {"task_status": status, "items": [self._item()], "summary": text, **extra}
-        return self._action(text, "finish", payload)
+        """一条素材有了结论：记账；还有素材就接着处理，全部处理完才真正 finish。"""
+        self.collected.append(
+            {"item": self._item(), "status": status, "text": text, "extra": extra}
+        )
+        if self.queue:
+            next_id = self.queue.pop(0)
+            self.mem = self._fresh_mem(next_id)
+            return self._action(
+                f"{self.collected[-1]['item']['asset_id']} 处理完毕，接着处理 {next_id}。",
+                "get_asset",
+                {"asset_id": next_id},
+            )
+        return self._action(text, "finish", self._finish_payload())
+
+    def _finish_payload(self) -> dict:
+        statuses = [c["status"] for c in self.collected]
+        if "pending_confirmation" in statuses:
+            total = "pending_confirmation"
+        elif "incomplete" in statuses:
+            total = "incomplete"
+        elif statuses and all(s == "blocked" for s in statuses):
+            total = "blocked"
+        else:
+            total = "completed"
+
+        label = {
+            "completed": "已完成",
+            "pending_confirmation": "待确认",
+            "blocked": "已阻断",
+            "incomplete": "未完成",
+        }
+        summary = "；".join(
+            f"{c['item']['asset_id']} {label.get(c['status'], c['status'])}"
+            for c in self.collected
+        )
+        payload: dict[str, Any] = {
+            "task_status": total,
+            "items": [c["item"] for c in self.collected],
+            "summary": summary,
+        }
+        if total == "incomplete":
+            reasons = [
+                c["extra"].get("incomplete_reason")
+                for c in self.collected
+                if c["status"] == "incomplete"
+            ]
+            payload["incomplete_reason"] = "；".join(r for r in reasons if r) or "存在未完成的素材"
+        return payload
 
     def _item(self) -> dict:
         mem = self.mem
@@ -184,9 +239,17 @@ class MockProvider:
             pending.append(f"时段由用户要求的 {required} 调整为 {slot}，需用户确认")
 
         draft = mem["draft"]
+        if blocking:
+            review = "risk_blocked"
+        elif any(r["level"] == "confirm" for r in mem["risks"]):
+            review = "risk_needs_review"
+        elif mem.get("missing"):
+            review = "unknown"
+        else:
+            review = "no_risk"
         return {
             "asset_id": mem["asset_id"],
-            "review_status": "risk_blocked" if blocking else ("unknown" if mem.get("missing") else "no_risk"),
+            "review_status": review,
             "risk_reasons": mem["risks"],
             "required_slot": required,
             "suggested_slot": slot,

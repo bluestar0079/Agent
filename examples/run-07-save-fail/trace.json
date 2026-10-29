@@ -2,20 +2,20 @@
   "run_id": "save_fail_m01",
   "provider": "qwen",
   "model": "qwen3.8-flash",
-  "started_at": "2026-10-29T09:55:32",
-  "finished_at": "2026-10-29T09:56:06",
+  "started_at": "2026-10-29T10:38:00",
+  "finished_at": "2026-10-29T10:38:25",
   "budget": {
     "max_steps": 14,
-    "used_steps": 8,
+    "used_steps": 7,
     "max_tool_calls": 12,
-    "used_tool_calls": 8
+    "used_tool_calls": 7
   },
   "infra_retries": 0,
   "status": "completed",
   "steps": [
     {
       "step": 1,
-      "decision_basis": "先读取素材 M01 的主数据，确认基础信息与是否存在缺失字段。",
+      "decision_basis": "先读取素材 M01 的主数据，确认类目与基本信息。",
       "action": {
         "tool": "get_asset",
         "args": {
@@ -39,7 +39,7 @@
     },
     {
       "step": 2,
-      "decision_basis": "素材数据完整，先做素材级规则检查（敏感类目 R1）。",
+      "decision_basis": "素材信息完整，无缺失字段。先做素材级规则检查（敏感类目）。",
       "action": {
         "tool": "check_rules",
         "args": {
@@ -59,7 +59,7 @@
     },
     {
       "step": 3,
-      "decision_basis": "素材级无风险，接着查询 A07 在 2026-11-02 的时段占用情况。",
+      "decision_basis": "素材级无风险。查询 A07 在 2026-11-02 的时段占用情况。",
       "action": {
         "tool": "query_slots",
         "args": {
@@ -116,7 +116,7 @@
     },
     {
       "step": 4,
-      "decision_basis": "时段表面空闲，但对用户要求的 18:00 仍需校验间隔、日上限、维护窗口等规则。",
+      "decision_basis": "18:00 显示空闲，但需校验间隔与单日上限，先检查用户硬要求的 18:00。",
       "action": {
         "tool": "check_rules",
         "args": {
@@ -137,11 +137,12 @@
     },
     {
       "step": 5,
-      "decision_basis": "18:00 合规且为用户硬性要求，排期前先按素材查是否已有草稿以防重复提交。",
+      "decision_basis": "18:00 通过全部时段规则，符合用户硬要求。先查是否已有草稿避免重复提交。",
       "action": {
         "tool": "find_existing_draft",
         "args": {
-          "asset_id": "M01"
+          "asset_id": "M01",
+          "slot": "18:00"
         }
       },
       "observation": {
@@ -155,14 +156,14 @@
     },
     {
       "step": 6,
-      "decision_basis": "无重复草稿，保存 18:00 排期草稿（未偏离用户要求）。",
+      "decision_basis": "无已有草稿，保存 18:00 的排期草稿。",
       "action": {
         "tool": "save_draft",
         "args": {
           "asset_id": "M01",
           "slot": "18:00",
           "deviation_from_required": false,
-          "note": "素材《秋季新品开箱 vlog》账号 A07，2026-11-02 18:00 排期草稿，素材级与时段级规则检查均无风险。仅草稿，未发布。"
+          "note": "秋季新品开箱 vlog，账号 A07，2026-11-02 18:00，规则检查无风险，按用户硬要求排期，仅草稿待发布。"
         }
       },
       "observation": {
@@ -178,41 +179,14 @@
     },
     {
       "step": 7,
-      "decision_basis": "保存失败且 retryable=true，按规则仅重试一次。",
+      "decision_basis": "保存失败但可重试，按规则重试一次。",
       "action": {
         "tool": "save_draft",
         "args": {
           "asset_id": "M01",
           "deviation_from_required": false,
-          "note": "素材《秋季新品开箱 vlog》账号 A07，2026-11-02 18:00 排期草稿，规则检查无风险。仅草稿，未发布。"
-        }
-      },
-      "observation": {
-        "ok": false,
-        "error": {
-          "code": "bad_arguments",
-          "message": "缺少必需参数：slot。本工具必需参数：asset_id, slot, deviation_from_required，请补全后重试。",
-          "required": [
-            "asset_id",
-            "slot",
-            "deviation_from_required"
-          ],
-          "retryable": true
-        }
-      },
-      "observation_summary": "失败 bad_arguments：缺少必需参数：slot。本工具必需参数：asset_id, slot, deviation_from_required，请补全后重试。",
-      "next_action": "调用 save_draft"
-    },
-    {
-      "step": 8,
-      "decision_basis": "上次调用漏传 slot 导致失败，补全必需参数后再试一次（服务故障后仅这一次机会）。",
-      "action": {
-        "tool": "save_draft",
-        "args": {
-          "asset_id": "M01",
-          "slot": "18:00",
-          "deviation_from_required": false,
-          "note": "素材《秋季新品开箱 vlog》账号 A07，2026-11-02 18:00 排期草稿，规则检查无风险。仅草稿，未发布。"
+          "note": "秋季新品开箱 vlog，账号 A07，2026-11-02 18:00，规则检查无风险，按用户硬要求排期，仅草稿待发布。",
+          "slot": "18:00"
         }
       },
       "observation": {
@@ -235,7 +209,7 @@
         "review_status": "no_risk",
         "risk_reasons": [],
         "required_slot": "18:00",
-        "suggested_slot": null,
+        "suggested_slot": "18:00",
         "slot_changed": false,
         "pending_confirmation": [],
         "draft": {
@@ -245,7 +219,7 @@
         }
       }
     ],
-    "summary": "素材 M01《秋季新品开箱 vlog》（账号 A07，2026-11-02）：素材级检查无敏感类目风险；对用户硬性要求的 18:00 做时段级校验（间隔 R2、单日 R3、维护窗口 R4/R5）均通过，未做任何时段改动。已确认无历史草稿，草稿保存成功（D-F54BD617，状态 saved_pending_confirmation，待运营确认）。过程中首次保存遇 storage_unavailable，第二次因漏传 slot 报参数错误，第三次补全参数后成功。仅保存草稿，未执行任何发布动作。",
+    "summary": "M01「秋季新品开箱 vlog」（账号 A07）素材级与时段级规则检查均无风险。用户硬要求 2026-11-02 18:00 通过 check_rules（间隔、单日上限、维护窗口均合规），未做时段变更。首次 save_draft 因存储服务不可用失败，按 retryable=true 重试一次成功，草稿 D-F54BD617 已保存为待确认状态。仅保存草稿，未执行任何发布操作。",
     "incomplete_reason": null
   }
 }

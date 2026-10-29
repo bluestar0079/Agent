@@ -31,10 +31,26 @@ class FinishItem(BaseModel):
     review_status: ReviewStatus
     risk_reasons: list[RiskItem] = Field(default_factory=list)
     required_slot: Optional[str] = Field(default=None, description="用户原始硬性要求，不得被改写")
-    suggested_slot: Optional[str] = None
+    suggested_slot: Optional[str] = Field(
+        default=None, description="有可排期结论时必填：能通过 check_rules 的那个时段"
+    )
     slot_changed: bool = False
     pending_confirmation: list[str] = Field(default_factory=list)
     draft: Optional[DraftInfo] = None
+
+    @model_validator(mode="after")
+    def _require_slot_when_schedulable(self) -> "FinishItem":
+        """给了「可排期」的结论，就必须说清楚排在几点。
+
+        被规则阻断或信息不足的素材本来就没有时段，这里不强制。
+        """
+        if self.review_status in ("no_risk", "risk_needs_review") and not self.suggested_slot:
+            raise ValueError(
+                f"素材 {self.asset_id} 的 review_status 为 {self.review_status}，"
+                "必须提供 suggested_slot（填 check_rules 通过的那个时段）；"
+                "若确实无法排期，请把 review_status 改为 risk_blocked 或 unknown 并说明原因"
+            )
+        return self
 
 
 class FinishResult(BaseModel):

@@ -34,6 +34,28 @@ def test_invalid_review_status_is_rejected():
         )
 
 
+@pytest.mark.parametrize("review_status", ["no_risk", "risk_needs_review"])
+def test_schedulable_item_requires_suggested_slot(review_status):
+    """能给「可排期」结论就必须说清排在几点——run-07 曾漏填。"""
+    with pytest.raises(ValidationError):
+        FinishResult(
+            task_status="completed",
+            items=[{"asset_id": "M01", "review_status": review_status}],
+            summary="x",
+        )
+
+
+@pytest.mark.parametrize("review_status", ["risk_blocked", "unknown"])
+def test_blocked_item_may_omit_suggested_slot(review_status):
+    """被阻断或信息不足的素材本来就没有时段，不强制填。"""
+    result = FinishResult(
+        task_status="blocked",
+        items=[{"asset_id": "M03", "review_status": review_status}],
+        summary="x",
+    )
+    assert result.items[0].suggested_slot is None
+
+
 def test_item_keeps_required_slot_separate_from_suggested_slot():
     result = FinishResult(
         task_status="pending_confirmation",

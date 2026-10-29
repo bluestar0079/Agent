@@ -1,0 +1,66 @@
+{
+  "task_status": "pending_confirmation",
+  "items": [
+    {
+      "asset_id": "M01",
+      "review_status": "risk_needs_review",
+      "risk_reasons": [
+        {
+          "rule_id": "R2",
+          "level": "block",
+          "reason": "18:00 距同账号同日 18:00 的排期仅 0 分钟，要求至少 120 分钟"
+        },
+        {
+          "rule_id": "R5",
+          "level": "confirm",
+          "reason": "用户硬性要求 18:00，建议时段 20:00 与之不同，需用户确认后才能生效"
+        }
+      ],
+      "required_slot": "18:00",
+      "suggested_slot": "20:00",
+      "slot_changed": true,
+      "pending_confirmation": [
+        "用户要求 18:00，但该时段被同账号 X02 占用并违反 R2 间隔规则；已按 20:00 保存草稿，需运营确认是否接受改期"
+      ],
+      "draft": {
+        "saved": true,
+        "draft_id": "D-E657FEE1",
+        "status": "saved_pending_confirmation"
+      }
+    },
+    {
+      "asset_id": "M03",
+      "review_status": "risk_blocked",
+      "risk_reasons": [
+        {
+          "rule_id": "R1",
+          "level": "block",
+          "reason": "类目「医疗健康」属于敏感类目，必须经法务审核后才能排期"
+        }
+      ],
+      "required_slot": null,
+      "suggested_slot": null,
+      "slot_changed": false,
+      "pending_confirmation": [
+        "M03 需先送法务审核，审核通过前不可排期"
+      ],
+      "draft": null
+    },
+    {
+      "asset_id": "M06",
+      "review_status": "no_risk",
+      "risk_reasons": [],
+      "required_slot": "18:00",
+      "suggested_slot": "18:00",
+      "slot_changed": false,
+      "pending_confirmation": [],
+      "draft": {
+        "saved": true,
+        "draft_id": "D-037D5153",
+        "status": "saved_pending_confirmation"
+      }
+    }
+  ],
+  "summary": "本批 3 条素材已处理完成（仅保存草稿，未做任何发布）。M01（A07）：用户要求的 18:00 被同账号 X02 占用、违反 R2 间隔≥120 分钟，建议改 20:00，已按 20:00 存草稿 D-E657FEE1（R5 需运营确认改期）。M03（A07）：医疗健康类目命中 R1 敏感类目阻断，必须先过法务审核，未排期、无草稿。M06（A08）：按 18:00 排期，各规则通过，已存草稿 D-037D5153。待确认事项：M01 的时段变更。",
+  "incomplete_reason": null
+}

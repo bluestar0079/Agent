@@ -59,6 +59,9 @@ PY="D:/Anaconda/python.exe"
 ```bash
 cp .env.example .env      # 填入 DASHSCOPE_API_KEY
 "$PY" -m src.cli run --scenario data/scenarios/conflict_m01.json --provider qwen --out runs/my-conflict
+
+# 一批三条素材（冲突 / 阻断 / 正常），一次 finish 交全部结论
+"$PY" -m src.cli run --scenario data/scenarios/batch_mixed_m01_m03_m06.json --provider qwen --out runs/my-batch
 ```
 
 默认模型是 `qwen3.8-flash`，走百炼的 OpenAI 兼容端点
@@ -70,7 +73,7 @@ cp .env.example .env      # 填入 DASHSCOPE_API_KEY
 "$PY" -m pytest -q
 ```
 
-29 个测试全部离线执行（用 `MockProvider` 和 `ScriptedProvider`），不依赖网络。
+34 个测试全部离线执行（用 `MockProvider` 和 `ScriptedProvider`），不依赖网络。
 
 ---
 
@@ -82,6 +85,7 @@ cp .env.example .env      # 填入 DASHSCOPE_API_KEY
 | 两条完全不同的执行路径 | 对比 `run-01-normal`（一路顺）与 `run-02-conflict`（中途改道） |
 | 工具失败后模型怎么调整 | `run-07-save-fail`（重试并自我修正）vs `run-08-save-fail-persistent`（放弃并如实上报） |
 | 步数上限 | `run-09-step-limit` |
+| 一批素材怎么逐条推进 | `run-10-batch`（第 8、10 步是模型自己切换到下一条素材） |
 | 设计取舍 | [docs/02-solution.md](docs/02-solution.md) |
 | 每个验收点的实际结果 | [docs/03-evaluation.md](docs/03-evaluation.md) |
 | 测试的完整实际输出 | [examples/pytest-output.txt](examples/pytest-output.txt) |
@@ -102,9 +106,9 @@ src/
   trace.py       逐步执行记录（不含模型内部思维过程）
   agent.py       ReAct 主循环、步数/工具调用预算、终止判定
   cli.py         命令行入口
-tests/           29 个测试，覆盖验收点与护栏
-examples/        9 组运行记录（input / output / trace / drafts / console.log）+ pytest 全量输出
-data/            素材、规则、已有排期、9 个场景定义
+tests/           34 个测试，覆盖验收点与护栏
+examples/        10 组运行记录（input / output / trace / drafts / console.log）+ pytest 全量输出
+data/            素材、规则、已有排期、10 个场景定义
 docs/            01-requirements ~ 05-retrospective
 ```
 
@@ -122,6 +126,7 @@ docs/            01-requirements ~ 05-retrospective
 | 重复提交不产生第二份草稿 | `duplicate_m06` | [examples/run-06-duplicate](examples/run-06-duplicate) |
 | 保存失败 → 重试 / 如实上报 | `save_fail_m01`、`save_fail_persistent_m01` | [run-07](examples/run-07-save-fail)、[run-08](examples/run-08-save-fail-persistent) |
 | 步数上限 → 明确未完成 | `step_limit_m01` | [examples/run-09-step-limit](examples/run-09-step-limit) |
+| 一批素材一次处理完 | `batch_mixed_m01_m03_m06` | [examples/run-10-batch](examples/run-10-batch) |
 
 ---
 
@@ -141,12 +146,12 @@ docs/            01-requirements ~ 05-retrospective
 
 ## 已知限制
 
-- **单素材处理**：一次 run 只处理一个素材，多素材批量处理未实现。
+- **批量是串行的**：一批素材按顺序处理，不并发；批次越大，单条的处理步数越容易被预算压缩。
+- **草稿之间不互相占位**：`save_draft` 只写草稿，不会把时段写进 `bookings`，所以同账号的两条素材
+  在同一批里理论上可能拿到同一个建议时段（见 [docs/03-evaluation.md](docs/03-evaluation.md) 3.4）。
 - **规则引擎是简化版**：只有类目、间隔、日上限、维护窗口、硬性要求五条，没有节假日/时区。
 - **草稿存储是 JSON 文件**：每次运行独立目录，没有并发与事务。
 - **Mock 只证明流程**：`--provider mock` 是写死的策略，不代表真实模型的决策能力。
-- **真实模型输出偶有不完整**：`run-07` 中模型保存了 18:00 的草稿，但 finish 时漏填 `suggested_slot`
-  （见 [docs/03-evaluation.md](docs/03-evaluation.md) 的失败记录），不影响任务结果，但会影响报告完整性。
 - **没有真实发布链路**：这是题目要求（仅保存草稿），不是缺失。
 
 ---
