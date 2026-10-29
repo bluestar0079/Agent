@@ -1,0 +1,123 @@
+{
+  "run_id": "missing_meta_m02",
+  "provider": "qwen",
+  "model": "qwen3.8-flash",
+  "started_at": "2026-10-29T09:44:12",
+  "finished_at": "2026-10-29T09:44:24",
+  "budget": {
+    "max_steps": 14,
+    "used_steps": 3,
+    "max_tool_calls": 12,
+    "used_tool_calls": 3
+  },
+  "infra_retries": 0,
+  "status": "blocked",
+  "steps": [
+    {
+      "step": 1,
+      "decision_basis": "先读取素材 M02 的主数据，确认基础信息与是否存在缺失字段。",
+      "action": {
+        "tool": "get_asset",
+        "args": {
+          "asset_id": "M02"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset": {
+          "asset_id": "M02",
+          "title": "家庭常备药品科普",
+          "account_id": "A07",
+          "category": null,
+          "required_time": "18:00",
+          "status": "pending"
+        },
+        "missing_fields": [
+          "category"
+        ]
+      },
+      "observation_summary": "读取 M02，类目=缺失，硬性时间=18:00，缺失字段=category",
+      "next_action": "调用 get_asset_detail"
+    },
+    {
+      "step": 2,
+      "decision_basis": "category 缺失，需从内容库补查后再做敏感类目判断。",
+      "action": {
+        "tool": "get_asset_detail",
+        "args": {
+          "asset_id": "M02"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset": {
+          "asset_id": "M02",
+          "title": "家庭常备药品科普",
+          "account_id": "A07",
+          "category": "医疗健康",
+          "required_time": "18:00",
+          "status": "pending",
+          "review_note": "内容库 CMS 类目标注 v3，2026-10-20 更新",
+          "source": "cms.asset_meta",
+          "detail_source": "cms.asset_meta",
+          "detail_note": "内容库 CMS 类目标注 v3，2026-10-20 更新"
+        },
+        "source": "cms.asset_meta",
+        "missing_fields": []
+      },
+      "observation_summary": "补查成功（cms.asset_meta），类目=医疗健康",
+      "next_action": "调用 check_rules"
+    },
+    {
+      "step": 3,
+      "decision_basis": "类目已补全为「医疗健康」，先做素材级规则检查，确认是否命中敏感类目阻断。",
+      "action": {
+        "tool": "check_rules",
+        "args": {
+          "asset_id": "M02",
+          "account_id": "A07"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset_id": "M02",
+        "slot": null,
+        "risks": [
+          {
+            "rule_id": "R1",
+            "level": "block",
+            "reason": "类目「医疗健康」属于敏感类目，必须经法务审核后才能排期"
+          }
+        ],
+        "missing_fields": []
+      },
+      "observation_summary": "R1(block) 类目「医疗健康」属于敏感类目，必须经法务审核后才能排期",
+      "next_action": "finish（结束并提交结果）"
+    }
+  ],
+  "result": {
+    "task_status": "blocked",
+    "items": [
+      {
+        "asset_id": "M02",
+        "review_status": "risk_blocked",
+        "risk_reasons": [
+          {
+            "rule_id": "R1",
+            "level": "block",
+            "reason": "类目「医疗健康」属于敏感类目，必须经法务审核后才能排期"
+          }
+        ],
+        "required_slot": "18:00",
+        "suggested_slot": null,
+        "slot_changed": false,
+        "pending_confirmation": [
+          "M02 需先通过法务审核，审核通过后才能按用户要求的 2026-11-02 18:00 重新排期"
+        ],
+        "draft": null
+      }
+    ],
+    "summary": "素材 M02（家庭常备药品科普，账号 A07）类目标注为「医疗健康」，素材级规则检查命中 R1 block：敏感类目须先经法务审核。因此未查询时段、未保存任何草稿，18:00 的排期要求暂未处理。请法务审核通过后再发起排期。全程仅做审核判断，未执行发布。",
+    "incomplete_reason": null
+  }
+}

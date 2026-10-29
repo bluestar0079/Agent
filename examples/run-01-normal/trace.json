@@ -1,0 +1,203 @@
+{
+  "run_id": "normal_m01",
+  "engine": "langgraph",
+  "provider": "qwen",
+  "model": "qwen3.8-flash",
+  "started_at": "2026-10-29T09:51:42",
+  "finished_at": "2026-10-29T09:52:02",
+  "budget": {
+    "max_steps": 14,
+    "used_steps": 6,
+    "max_tool_calls": 12,
+    "used_tool_calls": 6
+  },
+  "infra_retries": 0,
+  "status": "completed",
+  "steps": [
+    {
+      "step": 1,
+      "decision_basis": "先读取素材 M01 主数据，确认基础信息与是否存在缺失字段。",
+      "action": {
+        "tool": "get_asset",
+        "args": {
+          "asset_id": "M01"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset": {
+          "asset_id": "M01",
+          "title": "秋季新品开箱 vlog",
+          "account_id": "A07",
+          "category": "生活方式",
+          "required_time": "18:00",
+          "status": "pending"
+        },
+        "missing_fields": []
+      },
+      "observation_summary": "读取 M01，类目=生活方式，硬性时间=18:00",
+      "next_action": "调用 check_rules"
+    },
+    {
+      "step": 2,
+      "decision_basis": "素材主数据完整（账号 A07）。下一步做素材级规则检查。",
+      "action": {
+        "tool": "check_rules",
+        "args": {
+          "asset_id": "M01",
+          "account_id": "A07"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset_id": "M01",
+        "slot": null,
+        "risks": [],
+        "missing_fields": []
+      },
+      "observation_summary": "素材级 检查通过，无风险",
+      "next_action": "调用 query_slots"
+    },
+    {
+      "step": 3,
+      "decision_basis": "素材级无风险。现在查询 A07 在 2026-11-02 的时段占用情况。",
+      "action": {
+        "tool": "query_slots",
+        "args": {
+          "account_id": "A07",
+          "date": "2026-11-02"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "account_id": "A07",
+        "date": "2026-11-02",
+        "slots": [
+          {
+            "time": "17:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "18:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "19:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "20:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "21:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "22:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "23:00",
+            "available": true,
+            "occupied_by": null
+          }
+        ],
+        "bookings": [],
+        "note": "available 只表示该整点未被占用，仍需 check_rules 校验间隔与日上限"
+      },
+      "observation_summary": "可用 17:00,18:00,19:00,20:00,21:00,22:00,23:00；已占用 无",
+      "next_action": "调用 check_rules"
+    },
+    {
+      "step": 4,
+      "decision_basis": "18:00 时段空闲，但需校验间隔、日上限、维护窗口等时段规则。",
+      "action": {
+        "tool": "check_rules",
+        "args": {
+          "asset_id": "M01",
+          "account_id": "A07",
+          "slot": "18:00"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset_id": "M01",
+        "slot": "18:00",
+        "risks": [],
+        "missing_fields": []
+      },
+      "observation_summary": "18:00 检查通过，无风险",
+      "next_action": "调用 find_existing_draft"
+    },
+    {
+      "step": 5,
+      "decision_basis": "18:00 合规，符合用户硬性要求。先查是否已存在草稿，避免重复提交。",
+      "action": {
+        "tool": "find_existing_draft",
+        "args": {
+          "asset_id": "M01",
+          "slot": "18:00"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "count": 0,
+        "drafts": [],
+        "exists": false
+      },
+      "observation_summary": "无既有草稿",
+      "next_action": "调用 save_draft"
+    },
+    {
+      "step": 6,
+      "decision_basis": "无已有草稿，按用户要求的 18:00 保存草稿，未偏离硬性要求。",
+      "action": {
+        "tool": "save_draft",
+        "args": {
+          "asset_id": "M01",
+          "slot": "18:00",
+          "deviation_from_required": false,
+          "note": "素材 M01（秋季新品开箱 vlog）按用户要求排期 A07 / 2026-11-02 18:00，素材级与时段规则检查均无风险，仅存草稿待发布确认。"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "draft_id": "D-F54BD617",
+        "draft_status": "saved_pending_confirmation",
+        "created": true,
+        "deduplicated": false,
+        "deviation_from_required": false
+      },
+      "observation_summary": "草稿 D-F54BD617 保存成功（新建）",
+      "next_action": "finish（结束并提交结果）"
+    }
+  ],
+  "result": {
+    "task_status": "completed",
+    "items": [
+      {
+        "asset_id": "M01",
+        "review_status": "no_risk",
+        "risk_reasons": [],
+        "required_slot": "18:00",
+        "suggested_slot": "18:00",
+        "slot_changed": false,
+        "pending_confirmation": [],
+        "draft": {
+          "saved": true,
+          "draft_id": "D-F54BD617",
+          "status": "saved_pending_confirmation"
+        }
+      }
+    ],
+    "summary": "素材 M01（秋季新品开箱 vlog，账号 A07）主数据完整，素材级检查与 18:00 时段规则检查（R2/R3/R4/R5）均无风险。用户要求的 2026-11-02 18:00 时段空闲且合规，无需改动，已按原要求保存排期草稿 D-F54BD617，状态为 saved_pending_confirmation。未执行任何发布动作，草稿需运营确认后再走发布流程。",
+    "incomplete_reason": null
+  }
+}

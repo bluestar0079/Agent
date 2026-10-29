@@ -1,0 +1,21 @@
+{
+  "task_status": "incomplete",
+  "items": [
+    {
+      "asset_id": "M01",
+      "review_status": "no_risk",
+      "risk_reasons": [],
+      "required_slot": "18:00",
+      "suggested_slot": "18:00",
+      "slot_changed": false,
+      "pending_confirmation": [],
+      "draft": {
+        "saved": false,
+        "draft_id": null,
+        "status": "failed"
+      }
+    }
+  ],
+  "summary": "M01（秋季新品开箱 vlog，A07）素材级与时段级规则检查均无风险，用户要求的 2026-11-02 18:00 合规可用，且无已存在草稿。但保存草稿时存储服务返回权限错误（storage_forbidden，不可重试），草稿未成功写入，任务未完成。请人工检查草稿存储权限后重新执行保存；本流程未做任何发布操作。",
+  "incomplete_reason": "规则校验全部通过（18:00 无风险），但 save_draft 返回 ok=false，错误码 storage_forbidden（草稿存储服务权限错误），error.retryable=false，按约束不再重试，草稿未写入，也未发布。"
+}

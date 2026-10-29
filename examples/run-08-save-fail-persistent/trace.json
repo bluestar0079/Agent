@@ -1,0 +1,202 @@
+{
+  "run_id": "save_fail_persistent_m01",
+  "provider": "qwen",
+  "model": "qwen3.8-flash",
+  "started_at": "2026-10-29T09:54:24",
+  "finished_at": "2026-10-29T09:54:43",
+  "budget": {
+    "max_steps": 14,
+    "used_steps": 6,
+    "max_tool_calls": 12,
+    "used_tool_calls": 6
+  },
+  "infra_retries": 0,
+  "status": "incomplete",
+  "steps": [
+    {
+      "step": 1,
+      "decision_basis": "先读取素材 M01 的主数据，确认字段完整性和类目风险。",
+      "action": {
+        "tool": "get_asset",
+        "args": {
+          "asset_id": "M01"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset": {
+          "asset_id": "M01",
+          "title": "秋季新品开箱 vlog",
+          "account_id": "A07",
+          "category": "生活方式",
+          "required_time": "18:00",
+          "status": "pending"
+        },
+        "missing_fields": []
+      },
+      "observation_summary": "读取 M01，类目=生活方式，硬性时间=18:00",
+      "next_action": "调用 check_rules"
+    },
+    {
+      "step": 2,
+      "decision_basis": "素材字段完整，接下来做素材级规则检查（R1 敏感类目）。",
+      "action": {
+        "tool": "check_rules",
+        "args": {
+          "asset_id": "M01",
+          "account_id": "A07"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset_id": "M01",
+        "slot": null,
+        "risks": [],
+        "missing_fields": []
+      },
+      "observation_summary": "素材级 检查通过，无风险",
+      "next_action": "调用 query_slots"
+    },
+    {
+      "step": 3,
+      "decision_basis": "素材级无风险，查询 A07 当天 17:00-23:00 的时段占用情况。",
+      "action": {
+        "tool": "query_slots",
+        "args": {
+          "account_id": "A07",
+          "date": "2026-11-02"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "account_id": "A07",
+        "date": "2026-11-02",
+        "slots": [
+          {
+            "time": "17:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "18:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "19:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "20:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "21:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "22:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "23:00",
+            "available": true,
+            "occupied_by": null
+          }
+        ],
+        "bookings": [],
+        "note": "available 只表示该整点未被占用，仍需 check_rules 校验间隔与日上限"
+      },
+      "observation_summary": "可用 17:00,18:00,19:00,20:00,21:00,22:00,23:00；已占用 无",
+      "next_action": "调用 check_rules"
+    },
+    {
+      "step": 4,
+      "decision_basis": "18:00 空闲但需校验时段规则，先检查用户硬性要求的 18:00。",
+      "action": {
+        "tool": "check_rules",
+        "args": {
+          "asset_id": "M01",
+          "account_id": "A07",
+          "slot": "18:00"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset_id": "M01",
+        "slot": "18:00",
+        "risks": [],
+        "missing_fields": []
+      },
+      "observation_summary": "18:00 检查通过，无风险",
+      "next_action": "调用 find_existing_draft"
+    },
+    {
+      "step": 5,
+      "decision_basis": "18:00 通过全部规则校验，先确认是否已有草稿避免重复提交。",
+      "action": {
+        "tool": "find_existing_draft",
+        "args": {
+          "asset_id": "M01",
+          "slot": "18:00"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "count": 0,
+        "drafts": [],
+        "exists": false
+      },
+      "observation_summary": "无既有草稿",
+      "next_action": "调用 save_draft"
+    },
+    {
+      "step": 6,
+      "decision_basis": "无重复草稿，按用户要求的 18:00 保存草稿，未偏离硬性要求。",
+      "action": {
+        "tool": "save_draft",
+        "args": {
+          "asset_id": "M01",
+          "slot": "18:00",
+          "deviation_from_required": false,
+          "note": "秋季新品开箱 vlog 排期至 2026-11-02 18:00（A07），符合用户要求，规则校验无风险，仅存草稿待发布确认。"
+        }
+      },
+      "observation": {
+        "ok": false,
+        "error": {
+          "code": "storage_forbidden",
+          "message": "草稿存储服务拒绝写入（权限错误），重试无效",
+          "retryable": false
+        }
+      },
+      "observation_summary": "失败 storage_forbidden：草稿存储服务拒绝写入（权限错误），重试无效",
+      "next_action": "finish（结束并提交结果）"
+    }
+  ],
+  "result": {
+    "task_status": "incomplete",
+    "items": [
+      {
+        "asset_id": "M01",
+        "review_status": "no_risk",
+        "risk_reasons": [],
+        "required_slot": "18:00",
+        "suggested_slot": "18:00",
+        "slot_changed": false,
+        "pending_confirmation": [],
+        "draft": {
+          "saved": false,
+          "draft_id": null,
+          "status": "failed"
+        }
+      }
+    ],
+    "summary": "M01（秋季新品开箱 vlog，A07）素材级与时段级规则检查均无风险，用户要求的 2026-11-02 18:00 合规可用，且无已存在草稿。但保存草稿时存储服务返回权限错误（storage_forbidden，不可重试），草稿未成功写入，任务未完成。请人工检查草稿存储权限后重新执行保存；本流程未做任何发布操作。",
+    "incomplete_reason": "规则校验全部通过（18:00 无风险），但 save_draft 返回 ok=false，错误码 storage_forbidden（草稿存储服务权限错误），error.retryable=false，按约束不再重试，草稿未写入，也未发布。"
+  }
+}

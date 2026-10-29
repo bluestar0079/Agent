@@ -1,0 +1,11 @@
+[
+  {
+    "draft_id": "D-E657FEE1",
+    "asset_id": "M01",
+    "slot": "20:00",
+    "account_id": "A07",
+    "status": "saved_pending_confirmation",
+    "deviation_from_required": true,
+    "note": "M01「秋季新品开箱 vlog」用户要求 18:00，但 18:00 已被 X02 占用且违反 R2 同账号间隔≥120 分钟。建议 2026-11-02 20:00（通过 R2/R3/R4 校验，仅 R5 偏离要求需确认）。此为草稿，未发布，待运营确认时段变更。"
+  }
+]

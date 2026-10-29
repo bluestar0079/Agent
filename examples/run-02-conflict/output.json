@@ -1,0 +1,35 @@
+{
+  "task_status": "pending_confirmation",
+  "items": [
+    {
+      "asset_id": "M01",
+      "review_status": "risk_needs_review",
+      "risk_reasons": [
+        {
+          "rule_id": "R2",
+          "level": "block",
+          "reason": "18:00 距同账号同日 18:00 的排期仅 0 分钟，要求至少 120 分钟"
+        },
+        {
+          "rule_id": "R5",
+          "level": "confirm",
+          "reason": "用户硬性要求 18:00，建议时段 20:00 与之不同，需用户确认后才能生效"
+        }
+      ],
+      "required_slot": "18:00",
+      "suggested_slot": "20:00",
+      "slot_changed": true,
+      "pending_confirmation": [
+        "发布时段变更：用户硬性要求 2026-11-02 18:00 已被素材 X02 占用且违反 R2（同账号间隔≥120 分钟），无法排期；已按 20:00 存草稿，需用户确认是否接受该替代时段。",
+        "草稿仅为待确认状态，未执行任何发布动作。"
+      ],
+      "draft": {
+        "saved": true,
+        "draft_id": "D-E657FEE1",
+        "status": "saved_pending_confirmation"
+      }
+    }
+  ],
+  "summary": "M01（A07，2026-11-02）素材级检查无敏感类目风险。用户要求 18:00 不可用：该时段被 X02 占用，且 check_rules 返回 R2 block（同账号间隔需≥120 分钟）。19:00 距 X02 仅 60 分钟同样无法满足 R2，故校验 20:00，仅返回 R5 confirm（偏离硬性要求，需确认），无阻断。已在 20:00 保存草稿 D-E657FEE1（deviation_from_required=true），未发布。时段变更需运营确认后生效。",
+  "incomplete_reason": null
+}

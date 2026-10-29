@@ -1,0 +1,36 @@
+{
+  "scenario_id": "duplicate_m06",
+  "title": "重复提交：M06 在 18:00 已有一份草稿，再次提交不得产生第二份",
+  "date": "2026-11-02",
+  "asset_ids": [
+    "M06"
+  ],
+  "user_request": "请处理素材 M06，用户要求 18:00 发布。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [],
+    "drafts": [
+      {
+        "draft_id": "D-SEED-0001",
+        "asset_id": "M06",
+        "slot": "18:00",
+        "account_id": "A08",
+        "status": "saved_pending_confirmation",
+        "deviation_from_required": false,
+        "note": "首次提交时保存的草稿"
+      }
+    ]
+  },
+  "faults": {},
+  "expect": {
+    "task_status": "completed",
+    "saved": false,
+    "draft_slot": "18:00",
+    "must_call": [
+      "find_existing_draft"
+    ],
+    "must_not_call": [
+      "save_draft"
+    ],
+    "draft_count": 1
+  }
+}

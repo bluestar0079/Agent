@@ -1,0 +1,23 @@
+{
+  "scenario_id": "conflict_m01",
+  "title": "时段冲突：18:00 已被占用，19:00 空闲但违反 2 小时间隔，应落到 20:00 并待确认",
+  "date": "2026-11-02",
+  "asset_ids": ["M01"],
+  "user_request": "请处理素材 M01，用户要求 18:00 发布。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [
+      {"account_id": "A07", "slot": "17:30", "asset_id": "X01", "date": "2026-11-02"},
+      {"account_id": "A07", "slot": "18:00", "asset_id": "X02", "date": "2026-11-02"}
+    ],
+    "drafts": []
+  },
+  "faults": {},
+  "expect": {
+    "task_status": "pending_confirmation",
+    "saved": true,
+    "draft_slot": "20:00",
+    "slot_changed": true,
+    "must_call": ["query_slots", "check_rules", "save_draft"],
+    "min_check_rules_calls": 2
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "run_id": "duplicate_m06",
+  "provider": "qwen",
+  "model": "qwen3.8-flash",
+  "started_at": "2026-10-29T09:53:15",
+  "finished_at": "2026-10-29T09:53:34",
+  "budget": {
+    "max_steps": 14,
+    "used_steps": 5,
+    "max_tool_calls": 12,
+    "used_tool_calls": 5
+  },
+  "infra_retries": 0,
+  "status": "completed",
+  "steps": [
+    {
+      "step": 1,
+      "decision_basis": "我先读取 M06 主数据，确认字段完整再做规则检查。",
+      "action": {
+        "tool": "get_asset",
+        "args": {
+          "asset_id": "M06"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset": {
+          "asset_id": "M06",
+          "title": "冬季穿搭合集",
+          "account_id": "A08",
+          "category": "生活方式",
+          "required_time": "18:00",
+          "status": "pending"
+        },
+        "missing_fields": []
+      },
+      "observation_summary": "读取 M06，类目=生活方式，硬性时间=18:00",
+      "next_action": "调用 check_rules"
+    },
+    {
+      "step": 2,
+      "decision_basis": "字段完整，属 A08。下一步做素材级规则检查。",
+      "action": {
+        "tool": "check_rules",
+        "args": {
+          "asset_id": "M06",
+          "account_id": "A08"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset_id": "M06",
+        "slot": null,
+        "risks": [],
+        "missing_fields": []
+      },
+      "observation_summary": "素材级 检查通过，无风险",
+      "next_action": "调用 query_slots"
+    },
+    {
+      "step": 3,
+      "decision_basis": "素材级无风险。现在查 A08 当天时段占用情况。",
+      "action": {
+        "tool": "query_slots",
+        "args": {
+          "account_id": "A08",
+          "date": "2026-11-02"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "account_id": "A08",
+        "date": "2026-11-02",
+        "slots": [
+          {
+            "time": "17:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "18:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "19:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "20:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "21:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "22:00",
+            "available": true,
+            "occupied_by": null
+          },
+          {
+            "time": "23:00",
+            "available": true,
+            "occupied_by": null
+          }
+        ],
+        "bookings": [],
+        "note": "available 只表示该整点未被占用，仍需 check_rules 校验间隔与日上限"
+      },
+      "observation_summary": "可用 17:00,18:00,19:00,20:00,21:00,22:00,23:00；已占用 无",
+      "next_action": "调用 check_rules"
+    },
+    {
+      "step": 4,
+      "decision_basis": "时段表面空闲，但需校验规则。先检查用户硬性要求的 18:00。",
+      "action": {
+        "tool": "check_rules",
+        "args": {
+          "asset_id": "M06",
+          "account_id": "A08",
+          "slot": "18:00"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset_id": "M06",
+        "slot": "18:00",
+        "risks": [],
+        "missing_fields": []
+      },
+      "observation_summary": "18:00 检查通过，无风险",
+      "next_action": "调用 find_existing_draft"
+    },
+    {
+      "step": 5,
+      "decision_basis": "18:00 合规无风险。排期前先查是否已有草稿，避免重复提交。",
+      "action": {
+        "tool": "find_existing_draft",
+        "args": {
+          "asset_id": "M06",
+          "slot": "18:00"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "count": 1,
+        "drafts": [
+          {
+            "draft_id": "D-SEED-0001",
+            "asset_id": "M06",
+            "slot": "18:00",
+            "account_id": "A08",
+            "status": "saved_pending_confirmation",
+            "deviation_from_required": false,
+            "note": "首次提交时保存的草稿"
+          }
+        ],
+        "exists": true
+      },
+      "observation_summary": "命中 1 份已有草稿：D-SEED-0001@18:00",
+      "next_action": "finish（结束并提交结果）"
+    }
+  ],
+  "result": {
+    "task_status": "completed",
+    "items": [
+      {
+        "asset_id": "M06",
+        "review_status": "no_risk",
+        "risk_reasons": [],
+        "required_slot": "18:00",
+        "suggested_slot": "18:00",
+        "slot_changed": false,
+        "pending_confirmation": [],
+        "draft": {
+          "saved": false,
+          "draft_id": "D-SEED-0001",
+          "status": "existing_draft"
+        }
+      }
+    ],
+    "summary": "M06（冬季穿搭合集，A08）素材级与时段级规则检查均无风险，用户要求的 2026-11-02 18:00 合规可用。排期前查重发现该素材在 18:00 已存在草稿 D-SEED-0001（状态 saved_pending_confirmation，未偏离硬性要求），因此未重复调用 save_draft，本次未新建草稿。仅完成草稿核对，未做任何发布操作。",
+    "incomplete_reason": null
+  }
+}

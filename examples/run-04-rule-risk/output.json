@@ -1,0 +1,25 @@
+{
+  "task_status": "blocked",
+  "items": [
+    {
+      "asset_id": "M03",
+      "review_status": "risk_blocked",
+      "risk_reasons": [
+        {
+          "rule_id": "R1",
+          "level": "block",
+          "reason": "类目「医疗健康」属于敏感类目，必须经法务审核后才能排期"
+        }
+      ],
+      "required_slot": null,
+      "suggested_slot": null,
+      "slot_changed": false,
+      "pending_confirmation": [
+        "M03 属敏感类目（医疗健康），需先送法务审核，审核通过后才能重新排期，请确认由谁发起法务审核流程"
+      ],
+      "draft": null
+    }
+  ],
+  "summary": "M03（口腔护理产品测评，账号 A07）在素材级规则检查中命中 R1：类目「医疗健康」属敏感类目，level=block，必须经法务审核后才能排期。因此未查询时段、未生成任何草稿，2026-11-02 排期请求被阻断。用户未指定 required_time，无时段变更发生。请内容运营先推进法务审核，审核通过后再重新提交排期。本次仅执行审核判断，未执行任何发布操作。",
+  "incomplete_reason": null
+}

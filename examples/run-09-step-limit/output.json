@@ -1,0 +1,6 @@
+{
+  "task_status": "step_limit",
+  "items": [],
+  "summary": "任务未完成",
+  "incomplete_reason": "已达到执行步数上限 2，任务未完成"
+}

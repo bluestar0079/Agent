@@ -1,0 +1,25 @@
+{
+  "task_status": "blocked",
+  "items": [
+    {
+      "asset_id": "M02",
+      "review_status": "risk_blocked",
+      "risk_reasons": [
+        {
+          "rule_id": "R1",
+          "level": "block",
+          "reason": "类目「医疗健康」属于敏感类目，必须经法务审核后才能排期"
+        }
+      ],
+      "required_slot": "18:00",
+      "suggested_slot": null,
+      "slot_changed": false,
+      "pending_confirmation": [
+        "M02 需先通过法务审核，审核通过后才能按用户要求的 2026-11-02 18:00 重新排期"
+      ],
+      "draft": null
+    }
+  ],
+  "summary": "素材 M02（家庭常备药品科普，账号 A07）类目标注为「医疗健康」，素材级规则检查命中 R1 block：敏感类目须先经法务审核。因此未查询时段、未保存任何草稿，18:00 的排期要求暂未处理。请法务审核通过后再发起排期。全程仅做审核判断，未执行发布。",
+  "incomplete_reason": null
+}

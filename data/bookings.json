@@ -1,0 +1,7 @@
+{
+  "date": "2026-11-02",
+  "bookings": [
+    {"account_id": "A07", "slot": "17:30", "asset_id": "X01", "date": "2026-11-02"},
+    {"account_id": "A07", "slot": "18:00", "asset_id": "X02", "date": "2026-11-02"}
+  ]
+}

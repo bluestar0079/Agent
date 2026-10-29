@@ -1,0 +1,21 @@
+{
+  "task_status": "completed",
+  "items": [
+    {
+      "asset_id": "M01",
+      "review_status": "no_risk",
+      "risk_reasons": [],
+      "required_slot": "18:00",
+      "suggested_slot": null,
+      "slot_changed": false,
+      "pending_confirmation": [],
+      "draft": {
+        "saved": true,
+        "draft_id": "D-F54BD617",
+        "status": "saved_pending_confirmation"
+      }
+    }
+  ],
+  "summary": "素材 M01《秋季新品开箱 vlog》（账号 A07，2026-11-02）：素材级检查无敏感类目风险；对用户硬性要求的 18:00 做时段级校验（间隔 R2、单日 R3、维护窗口 R4/R5）均通过，未做任何时段改动。已确认无历史草稿，草稿保存成功（D-F54BD617，状态 saved_pending_confirmation，待运营确认）。过程中首次保存遇 storage_unavailable，第二次因漏传 slot 报参数错误，第三次补全参数后成功。仅保存草稿，未执行任何发布动作。",
+  "incomplete_reason": null
+}

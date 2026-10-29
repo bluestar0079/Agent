@@ -1,0 +1,52 @@
+{
+  "assets": [
+    {
+      "asset_id": "M01",
+      "title": "秋季新品开箱 vlog",
+      "account_id": "A07",
+      "category": "生活方式",
+      "required_time": "18:00",
+      "status": "pending"
+    },
+    {
+      "asset_id": "M02",
+      "title": "家庭常备药品科普",
+      "account_id": "A07",
+      "category": null,
+      "required_time": "18:00",
+      "status": "pending"
+    },
+    {
+      "asset_id": "M03",
+      "title": "口腔护理产品测评",
+      "account_id": "A07",
+      "category": "医疗健康",
+      "required_time": null,
+      "status": "pending"
+    },
+    {
+      "asset_id": "M04",
+      "title": "智能手表上手体验",
+      "account_id": "A07",
+      "category": "科技数码",
+      "required_time": "19:00",
+      "status": "pending"
+    },
+    {
+      "asset_id": "M05",
+      "title": "周末城市漫步",
+      "account_id": "A07",
+      "category": "生活方式",
+      "required_time": null,
+      "status": "pending"
+    },
+    {
+      "asset_id": "M06",
+      "title": "冬季穿搭合集",
+      "account_id": "A08",
+      "category": "生活方式",
+      "required_time": "18:00",
+      "status": "pending"
+    }
+  ]
+}

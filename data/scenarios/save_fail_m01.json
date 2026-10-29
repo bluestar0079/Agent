@@ -1,0 +1,25 @@
+{
+  "scenario_id": "save_fail_m01",
+  "title": "保存失败：首次 save_draft 返回 storage_unavailable，模型决定重试并成功",
+  "date": "2026-11-02",
+  "asset_ids": ["M01"],
+  "user_request": "请处理素材 M01，用户要求 18:00 发布。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [],
+    "drafts": []
+  },
+  "faults": {
+    "save_draft": {
+      "fail_times": 1,
+      "code": "storage_unavailable",
+      "message": "草稿存储服务暂时不可用，请稍后重试",
+      "retryable": true
+    }
+  },
+  "expect": {
+    "task_status": "completed",
+    "saved": true,
+    "must_call": ["save_draft"],
+    "save_draft_calls": 2
+  }
+}

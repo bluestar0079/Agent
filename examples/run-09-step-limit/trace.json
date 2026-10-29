@@ -1,0 +1,67 @@
+{
+  "run_id": "step_limit_m01",
+  "provider": "qwen",
+  "model": "qwen3.8-flash",
+  "started_at": "2026-10-29T09:54:45",
+  "finished_at": "2026-10-29T09:55:10",
+  "budget": {
+    "max_steps": 2,
+    "used_steps": 2,
+    "max_tool_calls": 12,
+    "used_tool_calls": 2
+  },
+  "infra_retries": 0,
+  "status": "step_limit",
+  "steps": [
+    {
+      "step": 1,
+      "decision_basis": "先读取素材 M01 的主数据，确认字段完整性和类目。",
+      "action": {
+        "tool": "get_asset",
+        "args": {
+          "asset_id": "M01"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset": {
+          "asset_id": "M01",
+          "title": "秋季新品开箱 vlog",
+          "account_id": "A07",
+          "category": "生活方式",
+          "required_time": "18:00",
+          "status": "pending"
+        },
+        "missing_fields": []
+      },
+      "observation_summary": "读取 M01，类目=生活方式，硬性时间=18:00",
+      "next_action": "调用 check_rules"
+    },
+    {
+      "step": 2,
+      "decision_basis": "字段完整，账号 A07。先做素材级规则检查（敏感类目 R1）。",
+      "action": {
+        "tool": "check_rules",
+        "args": {
+          "asset_id": "M01",
+          "account_id": "A07"
+        }
+      },
+      "observation": {
+        "ok": true,
+        "asset_id": "M01",
+        "slot": null,
+        "risks": [],
+        "missing_fields": []
+      },
+      "observation_summary": "素材级 检查通过，无风险",
+      "next_action": "finish（结束并提交结果）"
+    }
+  ],
+  "result": {
+    "task_status": "step_limit",
+    "items": [],
+    "summary": "任务未完成",
+    "incomplete_reason": "已达到执行步数上限 2，任务未完成"
+  }
+}

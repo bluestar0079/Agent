@@ -1,0 +1,35 @@
+{
+  "task_status": "pending_confirmation",
+  "items": [
+    {
+      "asset_id": "M04",
+      "review_status": "risk_needs_review",
+      "risk_reasons": [
+        {
+          "rule_id": "R2",
+          "level": "block",
+          "reason": "19:00 距同账号同日 18:00 的排期仅 60 分钟，要求至少 120 分钟"
+        },
+        {
+          "rule_id": "R5",
+          "level": "confirm",
+          "reason": "用户硬性要求 19:00，建议时段 20:00 与之不同，需用户确认后才能生效"
+        }
+      ],
+      "required_slot": "19:00",
+      "suggested_slot": "20:00",
+      "slot_changed": true,
+      "pending_confirmation": [
+        "发布时段由 19:00 变更为 20:00（R5）需运营/用户确认，未确认前不生效",
+        "19:00 因 R2 间隔不足被阻断，如坚持 19:00 需先调整同日 18:00 的 X02 排期"
+      ],
+      "draft": {
+        "saved": true,
+        "draft_id": "D-3F59CB83",
+        "status": "saved_pending_confirmation"
+      }
+    }
+  ],
+  "summary": "素材 M04（智能手表上手体验，账号 A07，2026-11-02）：素材级检查无风险；用户硬性要求 19:00 经 check_rules 被 R2 阻断（距同日 18:00 排期仅 60 分钟，需≥120 分钟）。已找到合规替代时段 20:00，仅有 R5 确认级提示。已保存草稿 D-3F59CB83（未发布），时段变更需用户确认。原始要求 19:00 未被擅自修改。",
+  "incomplete_reason": null
+}

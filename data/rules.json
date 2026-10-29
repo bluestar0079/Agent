@@ -1,0 +1,32 @@
+{
+  "R1": {
+    "level": "block",
+    "title": "敏感类目需法务审核",
+    "description": "类目属于医疗健康 / 金融理财 / 未成年人相关时，必须经法务审核后才能排期。",
+    "sensitive_categories": ["医疗健康", "金融理财", "未成年人相关"]
+  },
+  "R2": {
+    "level": "block",
+    "title": "同账号发布间隔",
+    "description": "同一账号两次发布之间至少间隔 2 小时。",
+    "min_gap_minutes": 120
+  },
+  "R3": {
+    "level": "block",
+    "title": "同账号单日条数",
+    "description": "同一账号单日最多 3 条排期（含已有排期）。",
+    "max_per_day": 3
+  },
+  "R4": {
+    "level": "block",
+    "title": "系统维护窗口",
+    "description": "02:00-06:00 为系统维护窗口，不可安排发布。",
+    "maintenance_start": "02:00",
+    "maintenance_end": "06:00"
+  },
+  "R5": {
+    "level": "confirm",
+    "title": "硬性发布时间不可擅自更改",
+    "description": "用户指定的 required_time 是硬性要求。发生冲突时只能建议替代时段并标记为待用户确认，不得直接变更要求。"
+  }
+}

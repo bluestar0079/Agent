@@ -1,0 +1,11 @@
+[
+  {
+    "draft_id": "D-SEED-0001",
+    "asset_id": "M06",
+    "slot": "18:00",
+    "account_id": "A08",
+    "status": "saved_pending_confirmation",
+    "deviation_from_required": false,
+    "note": "首次提交时保存的草稿"
+  }
+]

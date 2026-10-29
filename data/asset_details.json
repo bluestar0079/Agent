@@ -1,0 +1,8 @@
+{
+  "_comment": "get_asset_detail 的补查数据源，模拟内容库 CMS。只有主数据缺失时才会用到。",
+  "M02": {
+    "category": "医疗健康",
+    "review_note": "内容库 CMS 类目标注 v3，2026-10-20 更新",
+    "source": "cms.asset_meta"
+  }
+}

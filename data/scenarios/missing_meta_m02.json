@@ -1,0 +1,18 @@
+{
+  "scenario_id": "missing_meta_m02",
+  "title": "素材信息缺失：M02 缺少类目，补查后命中敏感类目规则",
+  "date": "2026-11-02",
+  "asset_ids": ["M02"],
+  "user_request": "请处理素材 M02，用户要求 18:00 发布。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [],
+    "drafts": []
+  },
+  "faults": {},
+  "expect": {
+    "task_status": "blocked",
+    "saved": false,
+    "must_call": ["get_asset", "get_asset_detail", "check_rules"],
+    "must_not_call": ["save_draft"]
+  }
+}

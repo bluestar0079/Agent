@@ -1,0 +1,11 @@
+[
+  {
+    "draft_id": "D-3F59CB83",
+    "asset_id": "M04",
+    "slot": "20:00",
+    "account_id": "A07",
+    "status": "saved_pending_confirmation",
+    "deviation_from_required": true,
+    "note": "用户要求 19:00，但 R2 阻断（距同日 18:00 排期仅 60 分钟，需≥120 分钟）。建议改 20:00，仅存草稿，待运营确认后再处理。"
+  }
+]

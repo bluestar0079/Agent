@@ -1,0 +1,20 @@
+{
+  "scenario_id": "step_limit_m01",
+  "title": "步数上限：把 max_steps 压到 2，验证触顶后返回明确的未完成状态",
+  "date": "2026-11-02",
+  "asset_ids": [
+    "M01"
+  ],
+  "user_request": "请处理素材 M01，用户要求 18:00 发布。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [],
+    "drafts": []
+  },
+  "faults": {},
+  "max_steps": 2,
+  "expect": {
+    "task_status": "step_limit",
+    "saved": false,
+    "incomplete_reason_contains": "步数"
+  }
+}

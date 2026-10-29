@@ -1,0 +1,23 @@
+{
+  "scenario_id": "hard_requirement_m04",
+  "title": "确认边界：M04 硬性要求 19:00 与间隔规则冲突，只能建议替代时段并待确认",
+  "date": "2026-11-02",
+  "asset_ids": ["M04"],
+  "user_request": "请处理素材 M04，用户要求 19:00 发布，这是硬性要求。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [
+      {"account_id": "A07", "slot": "17:30", "asset_id": "X01", "date": "2026-11-02"},
+      {"account_id": "A07", "slot": "18:00", "asset_id": "X02", "date": "2026-11-02"}
+    ],
+    "drafts": []
+  },
+  "faults": {},
+  "expect": {
+    "task_status": "pending_confirmation",
+    "saved": true,
+    "required_slot": "19:00",
+    "slot_changed": true,
+    "must_call": ["check_rules", "save_draft"],
+    "pending_confirmation_non_empty": true
+  }
+}

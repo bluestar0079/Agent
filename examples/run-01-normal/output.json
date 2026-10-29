@@ -1,0 +1,21 @@
+{
+  "task_status": "completed",
+  "items": [
+    {
+      "asset_id": "M01",
+      "review_status": "no_risk",
+      "risk_reasons": [],
+      "required_slot": "18:00",
+      "suggested_slot": "18:00",
+      "slot_changed": false,
+      "pending_confirmation": [],
+      "draft": {
+        "saved": true,
+        "draft_id": "D-F54BD617",
+        "status": "saved_pending_confirmation"
+      }
+    }
+  ],
+  "summary": "素材 M01（秋季新品开箱 vlog，账号 A07）主数据完整，素材级检查与 18:00 时段规则检查（R2/R3/R4/R5）均无风险。用户要求的 2026-11-02 18:00 时段空闲且合规，无需改动，已按原要求保存排期草稿 D-F54BD617，状态为 saved_pending_confirmation。未执行任何发布动作，草稿需运营确认后再走发布流程。",
+  "incomplete_reason": null
+}

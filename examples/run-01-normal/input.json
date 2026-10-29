@@ -1,0 +1,27 @@
+{
+  "scenario_id": "normal_m01",
+  "title": "正常排期：M01 要求 18:00，该账号当天无任何排期",
+  "date": "2026-11-02",
+  "asset_ids": [
+    "M01"
+  ],
+  "user_request": "请处理素材 M01，用户要求 18:00 发布。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [],
+    "drafts": []
+  },
+  "faults": {},
+  "expect": {
+    "task_status": "completed",
+    "saved": true,
+    "draft_slot": "18:00",
+    "slot_changed": false,
+    "must_call": [
+      "get_asset",
+      "check_rules",
+      "query_slots",
+      "find_existing_draft",
+      "save_draft"
+    ]
+  }
+}

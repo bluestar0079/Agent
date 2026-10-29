@@ -1,0 +1,19 @@
+{
+  "scenario_id": "rule_risk_m03",
+  "title": "规则风险：M03 属医疗健康类目，必须法务审核，应阻断排期",
+  "date": "2026-11-02",
+  "asset_ids": ["M03"],
+  "user_request": "请处理素材 M03，没有指定时间，尽快安排。只保存草稿，不要发布。",
+  "seed": {
+    "bookings": [],
+    "drafts": []
+  },
+  "faults": {},
+  "expect": {
+    "task_status": "blocked",
+    "saved": false,
+    "must_call": ["check_rules"],
+    "must_not_call": ["save_draft"],
+    "risk_rule": "R1"
+  }
+}
