@@ -84,6 +84,7 @@ cp .env.example .env      # 填入 DASHSCOPE_API_KEY
 | 步数上限 | `run-09-step-limit` |
 | 设计取舍 | [docs/02-solution.md](docs/02-solution.md) |
 | 每个验收点的实际结果 | [docs/03-evaluation.md](docs/03-evaluation.md) |
+| 测试的完整实际输出 | [examples/pytest-output.txt](examples/pytest-output.txt) |
 | AI 用在哪、人改了什么 | [docs/04-ai-usage.md](docs/04-ai-usage.md) |
 
 ---
@@ -102,7 +103,7 @@ src/
   agent.py       ReAct 主循环、步数/工具调用预算、终止判定
   cli.py         命令行入口
 tests/           29 个测试，覆盖验收点与护栏
-examples/        9 组运行记录（input / output / trace / drafts / console.log）
+examples/        9 组运行记录（input / output / trace / drafts / console.log）+ pytest 全量输出
 data/            素材、规则、已有排期、9 个场景定义
 docs/            01-requirements ~ 05-retrospective
 ```
