@@ -99,6 +99,24 @@ check_rules(slot=20:00) → 只有 R5 confirm，无 block
 `blocked`；否则 `completed`。这样 `run-10` 里"1 条待确认 + 1 条阻断 + 1 条完成"不会因为两条
 被阻断而被误报成整体 blocked。
 
+### ⑤ 用一个数字说明"不是固定分支"
+
+十组真实运行一共跑出了**七种不同的工具序列**：
+
+| 工具序列 | 出现在 |
+|---|---|
+| `get_asset → check_rules`（素材级就阻断 / 触顶） | run-04、run-09 |
+| `get_asset → get_asset_detail → check_rules`（补查后再判定） | run-03 |
+| `… → find_existing_draft → save_draft`（一路顺） | run-01、run-08 |
+| `… → check_rules → check_rules → …`（换候选时段） | run-02、run-05 |
+| `… → find_existing_draft` 后结束（命中已有草稿，不保存） | run-06 |
+| `… → save_draft → save_draft`（失败后重试） | run-07 |
+| `… save_draft → get_asset → … → save_draft`（批内切素材） | run-10 |
+
+如果动作是代码里的固定分支拼出来的，序列会收敛成少数几种；实际是「同样的入口、不同的走向」，
+差别全部来自上一步的工具返回。其中 `run-01` 与 `run-08` 序列相同但结局不同——
+因为 `save_draft` 在 run-08 里持续失败，模型停在了 `incomplete`，而不是照着脚本往下走。
+
 ## 2.4 技术取舍
 
 ### 原生实现，不用 LangGraph / AgentScope

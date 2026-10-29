@@ -140,6 +140,25 @@ docs/            01-requirements ~ 05-retrospective
 
 ---
 
+## 关键约束与证据
+
+这个项目有几条硬约束，不是写在文档里的承诺，而是代码结构或测试保证的。每条都能点开验证：
+
+| 约束 | 怎么保证的 | 在哪验证 |
+|---|---|---|
+| 只存草稿，没有发布能力 | 工具表里没有 `publish`，`FinishResult` 里没有 `published` 字段——越权发布在数据结构上无法表达 | `test_no_publish_capability_exists`、`test_result_schema_cannot_express_published` |
+| 失败不许上报成成功 | `draft.saved` 只由 `save_draft` 的真实返回决定，模型不能自行构造 | [run-08](examples/run-08-save-fail-persistent)（持续失败 → `incomplete`）、`test_persistent_save_failure_returns_incomplete` |
+| 动作由模型选，不是固定分支 | 主循环只负责「把模型的工具调用交给工具、把结果交回去」，不认识任何业务规则 | 10 组运行跑出 7 种不同的工具序列；[run-02](examples/run-02-conflict) 里模型自己跳过了空闲的 19:00 |
+| 执行有上限 | `max_steps` 与 `max_tool_calls` 双预算，任一触顶立即返回 `step_limit` 并说明原因 | [run-09](examples/run-09-step-limit)、`test_step_limit_is_enforced_for_looping_model` |
+| 结果可逐步骤复核 | 每步记录工具名、参数、返回摘要、下一步动作和模型自己写的 40 字决策依据 | [run-02/trace.json](examples/run-02-conflict/trace.json) |
+| 不落模型内部思维 | `reasoning_content` 只截取首句作摘要，完整过程不写盘 | `src/agent.py` 的 `_decision_hint()` |
+| 离线也能跑通 | `--provider mock` 是写死策略，34 个测试全部离线执行、无网络依赖 | README 快速开始第 2 步；[examples/pytest-output.txt](examples/pytest-output.txt) |
+| 不含真实密钥 | `.env` 在 `.gitignore` 中，仓库内只有 `.env.example` | `git ls-files` 里没有任何 `.env` |
+
+前四条是「审计型约束」——即使模型不配合也绕不过去，因为拦在工具层和 schema 层，不在提示词里。
+
+---
+
 ## 已知限制
 
 - **批量是串行的**：一批素材按顺序处理，不并发；批次越大，单条的处理步数越容易被预算压缩。
