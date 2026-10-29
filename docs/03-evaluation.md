@@ -22,7 +22,7 @@ $ "D:/Anaconda/python.exe" -m pytest -q
 | 测试文件 | 覆盖 | 用例数 |
 |---|---|---|
 | `test_tools.py` | 时段占用、R2 判定、草稿幂等、越权守门、参数错误可自愈、补查、故障注入 | 8 |
-| `test_agent_decision.py` | 九类验收点的端到端行为 + 两条路径必须不同 + 一批素材一次跑完 | 11 |
+| `test_agent_decision.py` | 九类场景的端到端行为 + 两条路径必须不同 + 一批素材一次跑完 | 11 |
 | `test_guardrails.py` | 无发布能力、schema 无法表达 published、失败不虚报、步数与工具调用上限 | 5 |
 | `test_schema.py` | finish 载荷校验（缺 reason、非法状态、required/suggested 分离、可排期时 suggested_slot 必填） | 10 |
 
@@ -57,7 +57,7 @@ assert tool_sequence(normal) != tool_sequence(conflict)
 | [run-09-step-limit](../examples/run-09-step-limit) | 步数上限 | `step_limit` | 2 | 触顶即停，返回未完成原因 |
 | [run-10-batch](../examples/run-10-batch) | 一批三素材（冲突 + 阻断 + 正常） | `pending_confirmation` | 15 | 一次 finish 交 3 条结论，2 份草稿，被阻断的那条不存草稿 |
 
-### 两条执行路径的对比（题目硬性要求）
+### 两条执行路径的对比
 
 | | run-01-normal | run-02-conflict |
 |---|---|---|
@@ -69,9 +69,9 @@ assert tool_sequence(normal) != tool_sequence(conflict)
 
 **输入相同、数据不同、模型的路径也不同**——这正是要证明的东西。
 
-### 与题目参考实例的差异（特此说明）
+### 为什么建议 20:00 而不是 19:00
 
-题目参考实例写的是「18:00 被占用、19:00 可用 → 建议 19:00」。本实现里 19:00 **同样空闲，但不合规**：
+19:00 在这组数据里**空闲，但不合规**：
 R2 要求同账号两次发布间隔 ≥120 分钟，而账号 A07 在 18:00 已有排期，19:00 只隔 60 分钟。
 所以建议时段是 20:00（差额刚好 120 分钟）。
 
@@ -80,14 +80,14 @@ R2 要求同账号两次发布间隔 ≥120 分钟，而账号 A07 在 18:00 已
 拿到阻断结果，才能推出 20:00——`run-02` 的 trace 第 4、5 步就是这个过程。
 
 差异来自规则参数而非硬编码：把 `data/rules.json` 的 `R2.min_gap_minutes` 从 `120` 改成 `60`，
-`check_rules(M01, A07, 19:00)` 立刻不再阻断，结果就回到参考实例的形态。可自行验证：
+`check_rules(M01, A07, 19:00)` 立刻不再阻断，19:00 就变成合规时段。可自行验证：
 
 ```bash
 # 把 data/rules.json 中 R2.min_gap_minutes 改为 60 后
 "$PY" -m src.cli run --scenario data/scenarios/conflict_m01.json --provider mock --out runs/gap60
 ```
 
-其余验收点（正常、信息缺失、规则风险、重复提交、保存失败、步数上限）与题目描述一致，无偏差。
+其余场景（正常、信息缺失、规则风险、重复提交、保存失败、步数上限）不受这条规则影响。
 
 ### 一个值得单独看的细节
 

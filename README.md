@@ -1,14 +1,10 @@
 # 素材审核与发布排期 Agent
 
-小影科技 2027 校招 AI Agent 笔试题 · **第 1 题「素材审核与发布排期 Agent」**
+内容团队每天都要回答同一组问题：这条素材能不能发？排在哪天、哪个时段？会不会和已有排期撞上？
+哪些事必须由人来拍板？
 
-帮内容运营判断素材能不能排期、该排在什么时段，冲突时给出替代方案并标记待确认项。
-**只保存草稿，不具备任何发布能力。**
-
-> 提交信息
-> - 题目：第 1 题
-> - GitHub：https://github.com/bluestar0079/Agent
-> - commit SHA：以 `main` 分支最新一次提交为准（提交表单中填写该 SHA）
+这个工具把「找待处理素材 → 判风险 → 排时段 → 存草稿 → 列出待确认项」串成一条可复核的流程。
+**它只保存草稿，不具备任何发布能力。**
 
 ---
 
@@ -77,17 +73,17 @@ cp .env.example .env      # 填入 DASHSCOPE_API_KEY
 
 ---
 
-## 评审入口（5 分钟看完）
+## 从哪里开始看（5 分钟）
 
 | 想看的 | 去哪看 |
 |---|---|
 | 真实的模型决策循环长什么样 | [examples/run-02-conflict/console.log](examples/run-02-conflict/console.log)（人读）<br>[examples/run-02-conflict/trace.json](examples/run-02-conflict/trace.json)（机读） |
 | 两条完全不同的执行路径 | 对比 `run-01-normal`（一路顺）与 `run-02-conflict`（中途改道） |
-| 工具失败后模型怎么调整 | `run-07-save-fail`（重试并自我修正）vs `run-08-save-fail-persistent`（放弃并如实上报） |
+| 工具失败后模型怎么调整 | `run-07-save-fail`（判断可重试后重试成功）vs `run-08-save-fail-persistent`（放弃并如实上报） |
 | 步数上限 | `run-09-step-limit` |
 | 一批素材怎么逐条推进 | `run-10-batch`（第 8、10 步是模型自己切换到下一条素材） |
 | 设计取舍 | [docs/02-solution.md](docs/02-solution.md) |
-| 每个验收点的实际结果 | [docs/03-evaluation.md](docs/03-evaluation.md) |
+| 每个场景的实际结果 | [docs/03-evaluation.md](docs/03-evaluation.md) |
 | 测试的完整实际输出 | [examples/pytest-output.txt](examples/pytest-output.txt) |
 | AI 用在哪、人改了什么 | [docs/04-ai-usage.md](docs/04-ai-usage.md) |
 
@@ -106,7 +102,7 @@ src/
   trace.py       逐步执行记录（不含模型内部思维过程）
   agent.py       ReAct 主循环、步数/工具调用预算、终止判定
   cli.py         命令行入口
-tests/           34 个测试，覆盖验收点与护栏
+tests/           34 个测试，覆盖场景与护栏
 examples/        10 组运行记录（input / output / trace / drafts / console.log）+ pytest 全量输出
 data/            素材、规则、已有排期、10 个场景定义
 docs/            01-requirements ~ 05-retrospective
@@ -114,9 +110,9 @@ docs/            01-requirements ~ 05-retrospective
 
 ---
 
-## 验收点对照
+## 场景覆盖
 
-| 题目要求的验收点 | 场景 | 证据 |
+| 场景 | 用例 | 证据 |
 |---|---|---|
 | 正常排期 | `normal_m01` | [examples/run-01-normal](examples/run-01-normal) |
 | 时段冲突 → 替代时段 + 待确认 | `conflict_m01` | [examples/run-02-conflict](examples/run-02-conflict) |
@@ -140,7 +136,7 @@ docs/            01-requirements ~ 05-retrospective
    不是靠提示词拦，是没有那条路。
 
 3. **工具失败要能被模型读懂**。所有工具返回 `{ok, error:{code, message, retryable}}`，
-   参数错误还会附带必需参数列表——`run-07` 里模型正是据此从「漏传 slot」中自我修正。
+   参数错误还会附带缺失字段和完整必需参数列表，模型据此就能补全重试。
 
 ---
 
@@ -152,7 +148,7 @@ docs/            01-requirements ~ 05-retrospective
 - **规则引擎是简化版**：只有类目、间隔、日上限、维护窗口、硬性要求五条，没有节假日/时区。
 - **草稿存储是 JSON 文件**：每次运行独立目录，没有并发与事务。
 - **Mock 只证明流程**：`--provider mock` 是写死的策略，不代表真实模型的决策能力。
-- **没有真实发布链路**：这是题目要求（仅保存草稿），不是缺失。
+- **没有真实发布链路**：这是设计约束（仅保存草稿），不是缺失。
 
 ---
 

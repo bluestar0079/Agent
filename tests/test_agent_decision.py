@@ -1,4 +1,4 @@
-"""端到端决策测试：每个用例对应题目的一条验收点。
+"""端到端决策测试：每个用例对应一类业务场景。
 
 全部使用 MockProvider（确定性策略）跑真实的主循环与工具层，
 因此断言的是「流程与状态正确」，不代表真实模型的决策质量。
@@ -121,7 +121,7 @@ def test_batch_processes_every_asset_in_one_run():
 
 
 def test_two_paths_use_different_tool_sequences():
-    """考试硬性要求：两条执行路径必须因工具结果不同而不同。"""
+    """运行数据不同，模型的执行路径就应当不同。"""
     _, normal_trace, _, _ = run_scenario("normal_m01")
     _, conflict_trace, _, _ = run_scenario("conflict_m01")
 
